@@ -118,13 +118,13 @@ defmodule Mix.Tasks.Aoc.Gen do
       end
 
       @doc \"\"\"
-      Runs both parts with the actual input and prints results.
+      Runs both parts with the actual input and prints results with timing.
       \"\"\"
       def solve do
         input = AOC.read_input(#{day})
 
-        IO.puts("Day #{day} - Part 1: \#{part1(input)}")
-        IO.puts("Day #{day} - Part 2: \#{part2(input)}")
+        AOC.solve_with_timing(#{day}, 1, fn -> part1(input) end)
+        AOC.solve_with_timing(#{day}, 2, fn -> part2(input) end)
       end
     end
     """

@@ -51,7 +51,57 @@ defmodule AOC do
   end
 
   @doc """
-  Solves a specific part of a specific day and prints the result.
+  Formats microseconds into a human-readable string with both raw and converted values.
+
+  ## Examples
+
+      AOC.format_time(234)       # "234 μs"
+      AOC.format_time(1234)      # "1234 μs (1.23 ms)"
+      AOC.format_time(1234567)   # "1234567 μs (1.23 s)"
+  """
+  def format_time(microseconds) do
+    cond do
+      microseconds < 1_000 ->
+        "#{microseconds} μs"
+
+      microseconds < 1_000_000 ->
+        ms = Float.round(microseconds / 1_000, 2)
+        "#{microseconds} μs (#{ms} ms)"
+
+      true ->
+        s = Float.round(microseconds / 1_000_000, 2)
+        "#{microseconds} μs (#{s} s)"
+    end
+  end
+
+  @doc """
+  Executes a function and times it, returning both the result and formatted time.
+
+  ## Examples
+
+      {result, time_str} = AOC.time_execution(fn -> expensive_operation() end)
+  """
+  def time_execution(fun) do
+    {time_us, result} = :timer.tc(fun)
+    {result, format_time(time_us)}
+  end
+
+  @doc """
+  Helper for day modules to run a part with timing.
+  Prints the result with timing information.
+
+  ## Examples
+
+      AOC.solve_with_timing(1, 1, fn -> part1(input) end)
+  """
+  def solve_with_timing(day, part, fun) do
+    {result, time_str} = time_execution(fun)
+    IO.puts("Day #{day} - Part #{part}: #{result} (completed in #{time_str})")
+    result
+  end
+
+  @doc """
+  Solves a specific part of a specific day and prints the result with timing.
 
   ## Parameters
   - `day`: The day number (1-25)
@@ -67,13 +117,14 @@ defmodule AOC do
     module = Module.concat(AOC.Days, "Day#{day_padded}")
     input = read_input(day)
 
-    result =
+    {result, time_str} = time_execution(fn ->
       case part do
         1 -> module.part1(input)
         2 -> module.part2(input)
       end
+    end)
 
-    IO.puts("Day #{day} - Part #{part}: #{result}")
+    IO.puts("Day #{day} - Part #{part}: #{result} (completed in #{time_str})")
     result
   end
 

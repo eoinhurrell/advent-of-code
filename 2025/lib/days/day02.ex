@@ -70,12 +70,12 @@ defmodule AOC.Days.Day02 do
   end
 
   @doc """
-  Runs both parts with the actual input and prints results.
+  Runs both parts with the actual input and prints results with timing.
   """
   def solve do
     input = AOC.read_input(2)
 
-    IO.puts("Day 2 - Part 1: #{part1(input)}")
-    IO.puts("Day 2 - Part 2: #{part2(input)}")
+    AOC.solve_with_timing(2, 1, fn -> part1(input) end)
+    AOC.solve_with_timing(2, 2, fn -> part2(input) end)
   end
 end
