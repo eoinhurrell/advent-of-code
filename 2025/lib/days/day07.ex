@@ -65,9 +65,42 @@ defmodule AOC.Days.Day07 do
     |> elem(0)
   end
 
-  defp solve_part2(data) do
-    # TODO: Implement part 2
+  defp count_timelines(data) do
+    {_data, {_, [start_col]}} = find_start(data)
+
+    initial = %{start_col => 1}
+
     data
+    |> Enum.drop(1)
+    |> Enum.reduce(initial, fn row, positions ->
+      positions
+      |> Enum.flat_map(fn {col, count} ->
+        case String.at(row, col) do
+          "^" ->
+            # Split: each timeline becomes two timelines
+            [{col - 1, count}, {col + 1, count}]
+
+          "." ->
+            # Continue straight
+            [{col, count}]
+
+          _ ->
+            # Path ends or continues?
+            []
+        end
+      end)
+      |> Enum.reduce(%{}, fn {col, count}, acc ->
+        # Merge timelines that arrive at same position
+        Map.update(acc, col, count, &(&1 + count))
+      end)
+    end)
+    |> Map.values()
+    |> Enum.sum()
+  end
+
+  defp solve_part2(data) do
+    data
+    |> count_timelines()
   end
 
   @doc """
